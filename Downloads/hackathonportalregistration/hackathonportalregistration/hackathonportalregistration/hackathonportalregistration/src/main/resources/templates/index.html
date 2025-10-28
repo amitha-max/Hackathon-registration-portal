@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackathon Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 3em;
+        }
+        .header p {
+            font-size: 1.2em;
+            margin: 10px 0 0 0;
+        }
+        .section {
+            background-color: white;
+            margin: 20px 0;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .api-endpoints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .endpoint {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+        }
+        .endpoint h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        .endpoint p {
+            margin: 5px 0;
+            color: #7f8c8d;
+        }
+        .method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .get { background-color: #27ae60; color: white; }
+        .post { background-color: #e67e22; color: white; }
+        .put { background-color: #f39c12; color: white; }
+        .delete { background-color: #e74c3c; color: white; }
+        .management-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .form-container, .data-container {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .data-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .data-item {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-info {
+            flex-grow: 1;
+        }
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #34495e;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to Hackathon Portal</h1>
+        <p>Your gateway to exciting hackathons and innovation</p>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2>About Our Platform</h2>
+            <p>The Hackathon Portal is a comprehensive platform designed to connect developers, innovators, and organizations for hackathons worldwide. Whether you're looking to participate in cutting-edge challenges or organize your own hackathon, we've got you covered.</p>
+        </div>
+
+
+
+        <div class="section">
+            <h2>Manage Hackathons</h2>
+            <div class="management-section">
+                <div class="form-container">
+                    <h3>Create/Edit Hackathon</h3>
+                    <form id="hackathonForm">
+                        <input type="hidden" id="hackathonId" name="hackathonId">
+                        <div class="form-group">
+                            <label for="hackathonTitle">Title:</label>
+                            <input type="text" id="hackathonTitle" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hackathonTheme">Theme:</label>
+                            <input type="text" id="hackathonTheme" name="theme" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hackathonDate">Date:</label>
+                            <input type="date" id="hackathonDate" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hackathonMaxParticipants">Max Participants:</label>
+                            <input type="number" id="hackathonMaxParticipants" name="maxParticipants" required>
+                        </div>
+                        <button type="submit" id="hackathonSubmitBtn">Create Hackathon</button>
+                        <button type="button" id="hackathonCancelBtn" style="display:none;">Cancel</button>
+                    </form>
+                </div>
+                <div class="data-container">
+                    <h3>Existing Hackathons</h3>
+                    <div id="hackathonsList" class="data-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Manage Users</h2>
+            <div class="management-section">
+                <div class="form-container">
+                    <h3>Create/Edit User</h3>
+                    <form id="userForm">
+                        <input type="hidden" id="userId" name="userId">
+                        <div class="form-group">
+                            <label for="userName">Name:</label>
+                            <input type="text" id="userName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userEmail">Email:</label>
+                            <input type="email" id="userEmail" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userContactNo">Contact Number:</label>
+                            <input type="text" id="userContactNo" name="contactNo" required>
+                        </div>
+                        <button type="submit" id="userSubmitBtn">Create User</button>
+                        <button type="button" id="userCancelBtn" style="display:none;">Cancel</button>
+                    </form>
+                </div>
+                <div class="data-container">
+                    <h3>Existing Users</h3>
+                    <div id="usersList" class="data-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Register for Hackathon</h2>
+            <div class="form-container">
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="regUserId">User ID:</label>
+                        <input type="number" id="regUserId" name="userId" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regHackathonId">Hackathon ID:</label>
+                        <input type="number" id="regHackathonId" name="hackathonId" required>
+                    </div>
+                    <button type="submit">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 Hackathon Portal. Built with Spring Boot.</p>
+    </div>
+
+    <script>
+        const baseUrl = 'http://localhost:8034';
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHackathons();
+            loadUsers();
+        });
+
+        // Hackathon management
+        async function loadHackathons() {
+            try {
+                const response = await fetch(`${baseUrl}/api/hackathons`);
+                const hackathons = await response.json();
+                displayHackathons(hackathons);
+            } catch (error) {
+                console.error('Error loading hackathons:', error);
+            }
+        }
+
+        function displayHackathons(hackathons) {
+            const container = document.getElementById('hackathonsList');
+            container.innerHTML = '';
+            hackathons.forEach(hackathon => {
+                const item = document.createElement('div');
+                item.className = 'data-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <strong>${hackathon.title}</strong> - ${hackathon.theme}<br>
+                        Date: ${hackathon.date} | Max Participants: ${hackathon.maxParticipants}
+                    </div>
+                    <div class="item-actions">
+                        <button onclick="editHackathon(${hackathon.hackathonId})">Edit</button>
+                        <button onclick="deleteHackathon(${hackathon.hackathonId})" class="delete-btn">Delete</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        document.getElementById('hackathonForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const hackathonId = formData.get('hackathonId');
+            const hackathon = {
+                title: formData.get('title'),
+                theme: formData.get('theme'),
+                date: formData.get('date'),
+                maxParticipants: parseInt(formData.get('maxParticipants'))
+            };
+
+            try {
+                let response;
+                if (hackathonId) {
+                    response = await fetch(`${baseUrl}/api/hackathons/${hackathonId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(hackathon)
+                    });
+                } else {
+                    response = await fetch(`${baseUrl}/api/hackathons`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(hackathon)
+                    });
+                }
+
+                if (response.ok) {
+                    resetHackathonForm();
+                    loadHackathons();
+                    alert('Hackathon saved successfully!');
+                } else {
+                    alert('Error saving hackathon');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error saving hackathon');
+            }
+        });
+
+        function editHackathon(id) {
+            fetch(`${baseUrl}/api/hackathons/${id}`)
+                .then(response => response.json())
+                .then(hackathon => {
+                    document.getElementById('hackathonId').value = hackathon.hackathonId;
+                    document.getElementById('hackathonTitle').value = hackathon.title;
+                    document.getElementById('hackathonTheme').value = hackathon.theme;
+                    document.getElementById('hackathonDate').value = hackathon.date;
+                    document.getElementById('hackathonMaxParticipants').value = hackathon.maxParticipants;
+                    document.getElementById('hackathonSubmitBtn').textContent = 'Update Hackathon';
+                    document.getElementById('hackathonCancelBtn').style.display = 'inline-block';
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function deleteHackathon(id) {
+            if (confirm('Are you sure you want to delete this hackathon?')) {
+                fetch(`${baseUrl}/api/hackathons/${id}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            loadHackathons();
+                            alert('Hackathon deleted successfully!');
+                        } else {
+                            alert('Error deleting hackathon');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error deleting hackathon');
+                    });
+            }
+        }
+
+        function resetHackathonForm() {
+            document.getElementById('hackathonForm').reset();
+            document.getElementById('hackathonId').value = '';
+            document.getElementById('hackathonSubmitBtn').textContent = 'Create Hackathon';
+            document.getElementById('hackathonCancelBtn').style.display = 'none';
+        }
+
+        document.getElementById('hackathonCancelBtn').addEventListener('click', resetHackathonForm);
+
+        // User management
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${baseUrl}/api/users`);
+                const users = await response.json();
+                displayUsers(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        function displayUsers(users) {
+            const container = document.getElementById('usersList');
+            container.innerHTML = '';
+            users.forEach(user => {
+                const item = document.createElement('div');
+                item.className = 'data-item';
+                item.innerHTML = `
+                    <div class="item-info">
+                        <strong>${user.name}</strong> - ${user.email}<br>
+                        Contact: ${user.contactNo} | Joined: ${user.joinDate}
+                    </div>
+                    <div class="item-actions">
+                        <button onclick="editUser(${user.userId})">Edit</button>
+                        <button onclick="deleteUser(${user.userId})" class="delete-btn">Delete</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        document.getElementById('userForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const userId = formData.get('userId');
+            const user = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                contactNo: formData.get('contactNo')
+            };
+
+            try {
+                let response;
+                if (userId) {
+                    response = await fetch(`${baseUrl}/api/users/${userId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(user)
+                    });
+                } else {
+                    response = await fetch(`${baseUrl}/api/users`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(user)
+                    });
+                }
+
+                if (response.ok) {
+                    resetUserForm();
+                    loadUsers();
+                    alert('User saved successfully!');
+                } else {
+                    alert('Error saving user');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error saving user');
+            }
+        });
+
+        function editUser(id) {
+            fetch(`${baseUrl}/api/users/${id}`)
+                .then(response => response.json())
+                .then(user => {
+                    document.getElementById('userId').value = user.userId;
+                    document.getElementById('userName').value = user.name;
+                    document.getElementById('userEmail').value = user.email;
+                    document.getElementById('userContactNo').value = user.contactNo;
+                    document.getElementById('userSubmitBtn').textContent = 'Update User';
+                    document.getElementById('userCancelBtn').style.display = 'inline-block';
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                fetch(`${baseUrl}/api/users/${id}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            loadUsers();
+                            alert('User deleted successfully!');
+                        } else {
+                            alert('Error deleting user');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error deleting user');
+                    });
+            }
+        }
+
+        function resetUserForm() {
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('userSubmitBtn').textContent = 'Create User';
+            document.getElementById('userCancelBtn').style.display = 'none';
+        }
+
+        document.getElementById('userCancelBtn').addEventListener('click', resetUserForm);
+
+        // Registration
+        document.getElementById('registrationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const registration = {
+                userId: parseInt(formData.get('userId')),
+                hackathonId: parseInt(formData.get('hackathonId'))
+            };
+
+            try {
+                const response = await fetch(`${baseUrl}/api/registrations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(registration)
+                });
+
+                if (response.ok) {
+                    e.target.reset();
+                    alert('Registration successful!');
+                } else {
+                    alert('Error registering for hackathon');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error registering for hackathon');
+            }
+        });
+    </script>
+</body>
+</html>
